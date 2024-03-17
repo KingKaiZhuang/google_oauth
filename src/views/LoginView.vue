@@ -1,17 +1,106 @@
 <template>
-  <GoogleLogin :callback="handleCallback" />
-  <h1>{{ userName }}</h1>
+  <div class="login-container">
+    <GoogleLogin :callback="handleCallback" />
+    <button v-if="userName" @click="handleLogout" class="logout-button">登出</button>
+    <h1 class="user-name">{{ userName }}</h1>
+  </div>
+  <div class="register-container">
+    <h2>註冊</h2>
+    <form @submit.prevent="NormalRegistion">
+      <div>
+        <label for="email">電子郵箱:</label>
+        <input id="email" type="email" v-model="user.email" required>
+      </div>
+      <div>
+        <label for="name">姓名:</label>
+        <input id="name" type="text" v-model="user.name" required>
+      </div>
+      <div>
+        <label for="password">密碼:</label>
+        <input id="password" type="password" v-model="user.password" required>
+      </div>
+      <div>
+        <label for="password_confirmation">確認密碼:</label>
+        <input id="password_confirmation" type="password" v-model="user.password_confirmation" required>
+      </div>
+      <button type="submit">註冊</button>
+    </form>
+  </div>
+
+  <div class="login-form">
+    <h2>登入</h2>
+    <form @submit.prevent="Normallogin">
+      <div class="form-group">
+        <label for="username">email</label>
+        <input type="text" id="username" v-model="credentials.email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">密碼</label>
+        <input type="password" id="password" v-model="credentials.password" required>
+      </div>
+      <button type="submit" class="btn-login">登入</button>
+    </form>
+    <p v-if="loginError" class="error-message">登入失敗，請檢查您的用戶名或密碼。</p>
+  </div>
+
 </template>
+
+<style>
+@import "../assets/scss/_LoginView.scss";
+</style>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios"; // 導入 axios
-import { GoogleLogin } from "vue3-google-login";
-import { decodeCredential } from "vue3-google-login";
+import { GoogleLogin,decodeCredential,googleLogout } from "vue3-google-login";
 import { googleOneTap } from "vue3-google-login";
 
 const userName = ref("");
+const loginError = ref(false);
 
+// 用戶註冊必填訊息
+const user = ref({
+  email: '',
+  name: '',
+  password: '',
+  password_confirmation: ''
+});
+
+// 登入必填訊息
+const credentials = ref({
+  email: '',
+  password: '',
+});
+// 一般註冊
+const NormalRegistion = () => {
+  axios.post('http://localhost:8000/api/register', user.value)
+    .then(response => {
+      // 處理響應，例如跳轉到登入頁面或首頁
+      console.log(response.data);
+      alert('註冊成功！');
+    })
+    .catch(error => {
+      // 處理錯誤，例如顯示錯誤訊息
+      console.error(error);
+      alert('註冊失敗，請檢查輸入資訊！');
+    });
+};
+// ㄧ般登入
+const Normallogin = () => {
+  axios.post('http://localhost:8000/api/login', credentials.value)
+    .then(response => {
+      console.log('登入成功:', response);
+      // 根據需要進行跳轉或保存 token 等操作
+      localStorage.setItem("token", response.data.access_token);
+      loginError.value = false;
+    })
+    .catch(error => {
+      console.error('登入失敗:', error);
+      loginError.value = true;
+    });
+};
+
+// google 登入和登出
 const handleCallback = async (response) => {
   if (response?.credential) {
     console.log(response);
@@ -46,6 +135,20 @@ const handleCallback = async (response) => {
   }
 };
 
+// 登出處理函數
+const handleLogout = () => {
+  // 清除本地儲存的 token
+  localStorage.removeItem("token");
+
+  // 清空用戶名
+  userName.value = "";
+-
+  // 調用 googleLogout 方法來登出 Google 帳號
+  googleLogout(() => {
+    console.log("Logout success");
+  });
+};
+// 第三方認證
 onMounted(() => {
   googleOneTap({ autoLogin: true })
     .then((response) => {

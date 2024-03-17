@@ -1,9 +1,13 @@
 <template>
-  <div>
-    <input v-model="name" type="text" placeholder="商店名稱" />
-    <button @click="createShop">創建商店</button>
+  <div class="shop-create-container">
+    <input v-model="name" type="text" placeholder="商店名稱" class="shop-input" />
+    <button @click="createShop" class="shop-button">創建商店</button>
   </div>
 </template>
+
+<style scoped>
+@import '../assets/scss/_ShopCreate.scss';
+</style>
 
 <script setup>
 import { ref } from 'vue';
