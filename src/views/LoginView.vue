@@ -4,28 +4,6 @@
     <button v-if="userName" @click="handleLogout" class="logout-button">登出</button>
     <h1 class="user-name">{{ userName }}</h1>
   </div>
-  <div class="register-container">
-    <h2>註冊</h2>
-    <form @submit.prevent="NormalRegistion">
-      <div>
-        <label for="email">電子郵箱:</label>
-        <input id="email" type="email" v-model="user.email" required>
-      </div>
-      <div>
-        <label for="name">姓名:</label>
-        <input id="name" type="text" v-model="user.name" required>
-      </div>
-      <div>
-        <label for="password">密碼:</label>
-        <input id="password" type="password" v-model="user.password" required>
-      </div>
-      <div>
-        <label for="password_confirmation">確認密碼:</label>
-        <input id="password_confirmation" type="password" v-model="user.password_confirmation" required>
-      </div>
-      <button type="submit">註冊</button>
-    </form>
-  </div>
 
   <div class="login-form">
     <h2>登入</h2>
@@ -40,56 +18,43 @@
       </div>
       <button type="submit" class="btn-login">登入</button>
     </form>
-    <p v-if="loginError" class="error-message">登入失敗，請檢查您的用戶名或密碼。</p>
+    <p v-if="loginError" class="error-message">登入失敗，請檢查您的信箱或密碼。</p>
   </div>
 
 </template>
 
-<style>
+<style scoped>
 @import "../assets/scss/_LoginView.scss";
 </style>
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios"; // 導入 axios
+import axios from "axios";
 import { GoogleLogin,decodeCredential,googleLogout } from "vue3-google-login";
 import { googleOneTap } from "vue3-google-login";
+import { useAuthStore } from "@/store/auth.js";
+import { storeToRefs } from 'pinia'
 
 const userName = ref("");
 const loginError = ref(false);
 
-// 用戶註冊必填訊息
-const user = ref({
-  email: '',
-  name: '',
-  password: '',
-  password_confirmation: ''
-});
+const authStore = useAuthStore()
+
 
 // 登入必填訊息
 const credentials = ref({
   email: '',
   password: '',
 });
-// 一般註冊
-const NormalRegistion = () => {
-  axios.post('http://localhost:8000/api/register', user.value)
-    .then(response => {
-      // 處理響應，例如跳轉到登入頁面或首頁
-      console.log(response.data);
-      alert('註冊成功！');
-    })
-    .catch(error => {
-      // 處理錯誤，例如顯示錯誤訊息
-      console.error(error);
-      alert('註冊失敗，請檢查輸入資訊！');
-    });
-};
+
 // ㄧ般登入
 const Normallogin = () => {
   axios.post('http://localhost:8000/api/login', credentials.value)
     .then(response => {
       console.log('登入成功:', response);
+      // pinia 除存登入狀態
+      authStore.setLoginStatus(true);
+      authStore.user = response.data.name;
       // 根據需要進行跳轉或保存 token 等操作
       localStorage.setItem("token", response.data.access_token);
       loginError.value = false;
@@ -123,6 +88,10 @@ const handleCallback = async (response) => {
       console.log(result.data.token); // 調整對應的 console.log 輸出
       // 儲存 JWT 到 localStorage
       localStorage.setItem("token", result.data.token);
+      localStorage.setItem("name", result.data.name);
+      // pinia 除存登入狀態
+      authStore.setLoginStatus(true);
+      authStore.user = result.data.name;
       
       console.log("Login success:", result.data); // 使用 result.data 來訪問響應數據
       userName.value = result.data.name;
@@ -139,9 +108,12 @@ const handleCallback = async (response) => {
 const handleLogout = () => {
   // 清除本地儲存的 token
   localStorage.removeItem("token");
+  localStorage.removeItem("name");
 
   // 清空用戶名
   userName.value = "";
+  authStore.isLoggedIn = false;
+  authStore.user = "";
 -
   // 調用 googleLogout 方法來登出 Google 帳號
   googleLogout(() => {
