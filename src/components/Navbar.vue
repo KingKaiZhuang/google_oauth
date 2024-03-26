@@ -21,6 +21,9 @@
           <li class="nav-item">
             <router-link class="nav-link active" to="/shop">Shop</router-link>
           </li>
+          <li class="nav-item">
+            <router-link class="nav-link active" to="/calendar">calendar</router-link>
+          </li>
           <li class="nav-item dropdown">
             <a
               class="nav-link dropdown-toggle"
@@ -33,9 +36,9 @@
               <span v-if="isLoggedIn">{{ user }}</span>
             </a>
             <ul class="dropdown-menu">
-              <li v-if="isLoggedIn"><a class="dropdown-item" href="#"><router-link class="nav-link active" to="/api/login">個人檔案</router-link></a></li>
-              <li v-if="!isLoggedIn"><a class="dropdown-item" href="#"><router-link class="nav-link active" to="/api/login">登入</router-link></a></li>
-              <li v-if="!isLoggedIn"><a class="dropdown-item" href="#"><router-link class="nav-link active" to="/api/registtion">註冊</router-link></a></li>
+              <li v-if="isLoggedIn"><a class="dropdown-item" href="#"><router-link class="nav-link active" to="/api/v3/login">個人檔案</router-link></a></li>
+              <li v-if="!isLoggedIn"><a class="dropdown-item" href="#"><router-link class="nav-link active" to="/api/v3/login">登入</router-link></a></li>
+              <li v-if="!isLoggedIn"><a class="dropdown-item" href="#"><router-link class="nav-link active" to="/api/v3/registtion">註冊</router-link></a></li>
               <li v-if="isLoggedIn"><hr class="dropdown-divider" /></li>
               <li v-if="isLoggedIn" @click="handleLogout"><a class="dropdown-item" href="#">登出</a></li>
             </ul>

@@ -70,6 +70,7 @@ const handleCallback = async (response) => {
   if (response?.credential) {
     console.log(response);
     console.log(response.credential);
+    localStorage.setItem("google_token", response.credential);
     const userData = decodeCredential(response.credential);
     console.log("Handle the userData", userData);
     // 假設後端需要 JWT token，則直接將 credential 發送給後端

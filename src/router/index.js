@@ -8,19 +8,13 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/api/login',
+    path: '/api/v3/login',
     name: 'login',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () => import('../views/LoginView.vue')
   },
   {
-    path: '/api/registtion',
+    path: '/api/v3/registtion',
     name: 'registtion',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () => import('../views/Registion.vue')
   },
   {
@@ -36,7 +30,12 @@ const routes = [
         component: () => import('../components/ShopList.vue'),
       }
     ]
-  }
+  },
+  {
+    path: '/calendar',
+    name: 'calendar',
+    component: () => import('../views/CalendarView.vue')
+  },
 ]
 
 const router = createRouter({
