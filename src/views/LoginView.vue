@@ -54,7 +54,7 @@ const Normallogin = () => {
       console.log('登入成功:', response);
       // pinia 除存登入狀態
       authStore.setLoginStatus(true);
-      authStore.user = response.data.name;
+      authStore.user = response.data.user.name;
       // 根據需要進行跳轉或保存 token 等操作
       localStorage.setItem("token", response.data.access_token);
       loginError.value = false;
