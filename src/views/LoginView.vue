@@ -69,10 +69,10 @@ const Normallogin = () => {
 const handleCallback = async (response) => {
   if (response?.credential) {
     console.log(response);
-    console.log(response.credential);
+    // console.log(response.credential);
     localStorage.setItem("google_token", response.credential);
     const userData = decodeCredential(response.credential);
-    console.log("Handle the userData", userData);
+    // console.log("Handle the userData", userData);
     // 假設後端需要 JWT token，則直接將 credential 發送給後端
     try {
       const result = await axios.post(
@@ -86,7 +86,8 @@ const handleCallback = async (response) => {
           },
         }
       );
-      console.log(result.data.token); // 調整對應的 console.log 輸出
+      // console.log("google_token",result);
+      // console.log(result.data.token);
       // 儲存 JWT 到 localStorage
       localStorage.setItem("token", result.data.token);
       localStorage.setItem("name", result.data.name);
@@ -94,7 +95,7 @@ const handleCallback = async (response) => {
       authStore.setLoginStatus(true);
       authStore.user = result.data.name;
       
-      console.log("Login success:", result.data); // 使用 result.data 來訪問響應數據
+      // console.log("Login success:", result.data);
       userName.value = result.data.name;
       console.log(userName.value);
       // 處理登入成功後的邏輯，例如保存 token

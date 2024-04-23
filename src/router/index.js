@@ -43,4 +43,23 @@ const router = createRouter({
   routes
 })
 
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token');
+
+  // 如果是訪問根路徑'/'，則直接放行
+  if (to.fullPath === '/') {
+    next();
+    return;
+  }
+
+  // 如果無token且試圖訪問非登錄頁面，則重定向到登錄頁面
+  if (!token && to.path !== '/api/v3/login') {
+    next('/api/v3/login');
+  } else {
+    // 有token或訪問的是登錄頁面，則正常放行
+    next();
+  }
+});
+
+
 export default router
